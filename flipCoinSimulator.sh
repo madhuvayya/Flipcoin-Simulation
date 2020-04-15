@@ -1,143 +1,74 @@
 #!/bin/bash
 
-echo "enter a number to flip coin:"
+echo "How many coins to be flipped:"
 read n
 
-singletPossible=("H" "T")
-doubletPossible=("HH" "HT" "TH" "TT")
-tripletPossible=("HHH" "HHT" "HTH" "HTT" "THH" "THT" "TTH" "TTT")
+echo "How many times to be flipped:"
+read t
 
-declare -A singlet
-declare -A doublet
-declare -A triplet
+str=""
+numOfPossibilities=0
 
-for((i=0;i<n;i++))
-do
-	singletCheck=$((RANDOM%2))
+declare -A events
 
-	if [ $singletCheck -eq 1 ]
+flip(){
+	str=""
+	check=$((RANDOM%2))
+
+	if [ $check -eq 1 ]
 	then
-		singlet[$i]="H"
+		str=H
 	else
-		singlet[$i]="T"
+		str=T
 	fi
+}
 
-	doubletCheck=$((RANDOM%4))
-	case $doubletCheck in
-		0 )
-			doublet[$i]="HH"
-			;;
-		1 )
-			doublet[$i]="HT"
-			;;
-		2 )
-			doublet[$i]="TH"
-			;;
-		3 )
-			doublet[$i]="TT"
-			;;
-	esac
+outComes(){
 
-	tripletCheck=$((RANDOM%8))
-	case $doubletCheck in
-		0 )
-			triplet[$i]="HHH"
-			;;
-		1 )
-			triplet[$i]="HHT"
-			;;
-		2 )
-			triplet[$i]="HTH"
-			;;
-		3 )
-			triplet[$i]="HTT"
-			;;
-		4 )
-			triplet[$i]="THH"
-			;;
-		5 )
-			triplet[$i]="THT"
-			;;
-		6 )
-			triplet[$i]="TTH"
-			;;
-		7 )
-			triplet[$i]="TTT"
-			;;
-	esac
-done
-
-echo ${singlet[@]}
-echo ${!singlet[@]}
-
-k=0
-for i in ${singletPossible[@]}
-do
-	t=0
-	for j in ${singlet[@]}
+	for((i=0;i<$t;i++))
 	do
-		if [ $i = $j ]
-		then
-			((t++));
-		fi
+		for((j=0;j<$n;j++))
+		do
+			#Invoking flip function
+			flip
+			event=$event$str
+		done
+
+		eventsDictionary[$i]=$event
+
+		event=""
 	done
 
-	if [ $t -gt $k ]
-	then
-		max=$i
-		k=$t
-	fi
-done
+	echo "Total out comes:" ${eventsDictionary[@]}
+}
 
-per=$(($k / $n * 100))
-echo "Singlet percentage: $per"
+findMaxOccuredPercent(){
 
-echo ${doublet[@]}
-echo ${!doublet[@]}
+	numOfTimes=0
 
-k=0
-for i in ${doubletPossible[@]}
-do
-	t=0
-	for j in ${doublet[@]}
+	for((i=0;i<${#eventsDictionary[@]};i++))
 	do
-		if [ $i = $j ]
-		then
-			((t++));
-		fi
+		temp=0
+		for((j=1;j<${#eventsDictionary[@]};j++))
+		do
+			if [ "${eventsDictionary[$i]}" = "${eventsDictionary[$j]}" ]
+			then
+				((temp++))
+			fi
+
+			if [ $temp -gt $numOfTimes ]
+			then
+				maxOccured=${eventsDictionary[$i]}
+				numOfTimes=$temp
+			fi
+		done
 	done
 
-	if [ $t -gt $k ]
-	then
-		max=$i
-		k=$t
-	fi
-done
+	percent=$( echo "scale=2; ( $numOfTimes * 100 ) / $t " | bc )
+	echo $maxOccured "is occured " $numOfTimes "times"
+	echo "Winning combination $maxOccured percentage is $percent"
+}
 
-per=$(($k / $n * 100))
-echo "Doublet percentage: $per"
+outComes
 
-echo ${triplet[@]}
-echo ${!triplet[@]}
-
-k=0
-for i in ${tripletPossible[@]}
-do
-	t=0
-	for j in ${triplet[@]}
-	do
-		if [ $i = $j ]
-		then
-			((t++));
-		fi
-	done
-
-	if [ $t -gt $k ]
-	then
-		max=$i
-		k=$t
-	fi
-done
-
-per=$(($k / $n * 100))
-echo "Triplet percentage: $per"
+findMaxOccuredPercent

@@ -42,6 +42,10 @@ outComes(){
 	echo "Total out comes:" ${eventsDictionary[@]}
 }
 
+sortOutcomes(){
+	printf '%s\n' "${eventsDictionary[@]}" | sort -n
+}
+
 findMaxOccuredPercent(){
 
 	numOfTimes=0
@@ -64,11 +68,13 @@ findMaxOccuredPercent(){
 		done
 	done
 
-	percent=$( echo "scale=2; ( $numOfTimes * 100 ) / $t " | bc )
+	percent=$(( $numOfTimes * 100  / $t  ))
 	echo $maxOccured "is occured " $numOfTimes "times"
 	echo "Winning combination $maxOccured percentage is $percent"
 }
 
 outComes
+
+sortOutcomes
 
 findMaxOccuredPercent
